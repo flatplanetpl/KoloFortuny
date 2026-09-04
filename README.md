@@ -17,16 +17,16 @@ Szanse są orientacyjnie dopasowane odwrotnie do wartości nagród. Geometria ko
 
 | Nagroda | Szansa |
 | --- | ---: |
-| Nagroda pocieszenia (łącznie 4 pola) | 35% |
-| Chipsy | 13% |
-| Lemoniada ogórkowa | 10% |
-| Lemoniada cytrynowa | 10% |
-| Pils 0,3 | 7% |
-| Pszenica 0,3 | 6% |
-| Piwo bezalkoholowe | 6% |
-| Pils 0,5 | 5% |
-| Pszenica 0,5 | 4% |
-| Dowolny drink alk/bezalk | 4% |
+| Nagroda pocieszenia (łącznie 4 pola) | 70% |
+| Chipsy | 6% |
+| Lemoniada ogórkowa | 4,5% |
+| Lemoniada cytrynowa | 4,5% |
+| Pils 0,3 | 3% |
+| Pszenica 0,3 | 3% |
+| Piwo bezalkoholowe | 3% |
+| Pils 0,5 | 2% |
+| Pszenica 0,5 | 2% |
+| Dowolny drink alk/bezalk | 2% |
 
 ## Uruchomienie
 
