@@ -2,22 +2,23 @@
   'use strict';
 
   const prizes = [
-    { name: 'Nagroda pocieszenia', icon: '★', lines: ['Nagroda', 'pocieszenia'] },
-    { name: 'Dowolny drink alk/bezalk', icon: '🍹', lines: ['Dowolny', 'drink', 'alk/bezalk'] },
-    { name: 'Nagroda pocieszenia', icon: '★', lines: ['Nagroda', 'pocieszenia'] },
-    { name: 'Pszenica 0,3', icon: '🍺', lines: ['Pszenica', '0,3'] },
-    { name: 'Piwo bezalkoholowe', icon: '🍺', lines: ['Piwo', 'bezalkoholowe'] },
-    { name: 'Lemoniada ogórkowa', icon: '🥒', lines: ['Lemoniada', 'ogórkowa'] },
-    { name: 'Pszenica 0,5', icon: '🍺', lines: ['Pszenica', '0,5'] },
-    { name: 'Lemoniada cytrynowa', icon: '🍋', lines: ['Lemoniada', 'cytrynowa'] },
-    { name: 'Chipsy', icon: '🥔', lines: ['Chipsy'] },
-    { name: 'Nagroda pocieszenia', icon: '★', lines: ['Nagroda', 'pocieszenia'] },
-    { name: 'Nagroda pocieszenia', icon: '★', lines: ['Nagroda', 'pocieszenia'] },
-    { name: 'Pils 0,3', icon: '🍺', lines: ['Pils', '0,3'] },
-    { name: 'Pils 0,5', icon: '🍺', lines: ['Pils', '0,5'] }
+    { name: 'Nagroda pocieszenia', icon: '★', lines: ['Nagroda', 'pocieszenia'], weight: 35 },
+    { name: 'Dowolny drink alk/bezalk', icon: '🍹', lines: ['Dowolny', 'drink', 'alk/bezalk'], weight: 16 },
+    { name: 'Nagroda pocieszenia', icon: '★', lines: ['Nagroda', 'pocieszenia'], weight: 35 },
+    { name: 'Pszenica 0,3', icon: '🍺', lines: ['Pszenica', '0,3'], weight: 24 },
+    { name: 'Piwo bezalkoholowe', icon: '🍺', lines: ['Piwo', 'bezalkoholowe'], weight: 24 },
+    { name: 'Lemoniada ogórkowa', icon: '🥒', lines: ['Lemoniada', 'ogórkowa'], weight: 40 },
+    { name: 'Pszenica 0,5', icon: '🍺', lines: ['Pszenica', '0,5'], weight: 16 },
+    { name: 'Lemoniada cytrynowa', icon: '🍋', lines: ['Lemoniada', 'cytrynowa'], weight: 40 },
+    { name: 'Chipsy', icon: '🥔', lines: ['Chipsy'], weight: 52 },
+    { name: 'Nagroda pocieszenia', icon: '★', lines: ['Nagroda', 'pocieszenia'], weight: 35 },
+    { name: 'Nagroda pocieszenia', icon: '★', lines: ['Nagroda', 'pocieszenia'], weight: 35 },
+    { name: 'Pils 0,3', icon: '🍺', lines: ['Pils', '0,3'], weight: 28 },
+    { name: 'Pils 0,5', icon: '🍺', lines: ['Pils', '0,5'], weight: 20 }
   ];
 
   const segmentAngle = 360 / prizes.length;
+  const totalPrizeWeight = prizes.reduce((sum, prize) => sum + prize.weight, 0);
   const pointerAngle = -90;
   const firstSectorCenter = -90;
   const sectorColors = [
@@ -62,7 +63,7 @@
 
   wheel.setAttribute(
     'aria-label',
-    'Koło nagród z 13 równymi polami.'
+    'Koło nagród z 13 równymi wizualnie polami i ważonymi szansami nagród.'
   );
   buildWheel();
   renderPrizeList();
@@ -225,7 +226,15 @@
     const fragment = document.createDocumentFragment();
     prizes.forEach((prize) => {
       const item = document.createElement('li');
-      item.textContent = prize.name;
+      const name = document.createElement('span');
+      name.className = 'prize-key-name';
+      name.textContent = prize.name;
+
+      const chance = document.createElement('span');
+      chance.className = 'prize-key-chance';
+      chance.textContent = formatChance(prize.weight);
+
+      item.append(name, chance);
       fragment.append(item);
     });
     wheelPrizeList.replaceChildren(fragment);
@@ -245,6 +254,24 @@
       crypto.getRandomValues(values);
     } while (values[0] >= limit);
     return values[0] % max;
+  }
+
+  function weightedPrizeIndex() {
+    const ticket = randomInt(totalPrizeWeight);
+    let cumulativeWeight = 0;
+
+    for (let index = 0; index < prizes.length; index += 1) {
+      cumulativeWeight += prizes[index].weight;
+      if (ticket < cumulativeWeight) return index;
+    }
+
+    return prizes.length - 1;
+  }
+
+  function formatChance(weight) {
+    return `${(weight / totalPrizeWeight * 100).toLocaleString('pl-PL', {
+      maximumFractionDigits: 2
+    })}%`;
   }
 
   function storageArea(name) {
@@ -468,7 +495,7 @@
     statusTitle.textContent = 'Koło się kręci';
     statusCopy.textContent = 'Jeszcze chwila — zapadka już szuka zwycięskiego pola.';
 
-    const winnerIndex = randomInt(prizes.length);
+    const winnerIndex = weightedPrizeIndex();
     const winner = prizes[winnerIndex];
     const safeJitter = (secureRandom() - .5) * segmentAngle * .56;
     const desiredModulo = normalize(pointerAngle - sectorCenter(winnerIndex) + safeJitter);
