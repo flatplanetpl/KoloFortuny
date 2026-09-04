@@ -1,0 +1,53 @@
+# Dependencies
+node_modules/
+
+# Environment and local configuration
+.env
+.env.*
+!.env.example
+*.local
+.dev.vars
+
+# Build output and caches
+dist/
+build/
+coverage/
+.cache/
+.parcel-cache/
+.vite/
+.wrangler/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Tests and reports
+playwright-report/
+test-results/
+
+# Editors
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.swp
+*.swo
+
+# Operating systems
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Temporary files and archives
+tmp/
+temp/
+*.tmp
+*.bak
+*.zip
+*.tar.gz
+
+# Local deployment metadata
+.openai/
+
