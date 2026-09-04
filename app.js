@@ -3,18 +3,18 @@
 
   const prizes = [
     { name: 'Nagroda pocieszenia', icon: '★', lines: ['Nagroda', 'pocieszenia'], weight: 35 },
-    { name: 'Dowolny drink alk/bezalk', icon: '🍹', lines: ['Dowolny', 'drink', 'alk/bezalk'], weight: 16 },
+    { name: 'Dowolny drink alk/bezalk', icon: '🍹', lines: ['Dowolny', 'drink', 'alk/bezalk'], weight: 4 },
     { name: 'Nagroda pocieszenia', icon: '★', lines: ['Nagroda', 'pocieszenia'], weight: 35 },
-    { name: 'Pszenica 0,3', icon: '🍺', lines: ['Pszenica', '0,3'], weight: 24 },
-    { name: 'Piwo bezalkoholowe', icon: '🍺', lines: ['Piwo', 'bezalkoholowe'], weight: 24 },
-    { name: 'Lemoniada ogórkowa', icon: '🥒', lines: ['Lemoniada', 'ogórkowa'], weight: 40 },
-    { name: 'Pszenica 0,5', icon: '🍺', lines: ['Pszenica', '0,5'], weight: 16 },
-    { name: 'Lemoniada cytrynowa', icon: '🍋', lines: ['Lemoniada', 'cytrynowa'], weight: 40 },
-    { name: 'Chipsy', icon: '🥔', lines: ['Chipsy'], weight: 52 },
+    { name: 'Pszenica 0,3', icon: '🍺', lines: ['Pszenica', '0,3'], weight: 6 },
+    { name: 'Piwo bezalkoholowe', icon: '🍺', lines: ['Piwo', 'bezalkoholowe'], weight: 6 },
+    { name: 'Lemoniada ogórkowa', icon: '🥒', lines: ['Lemoniada', 'ogórkowa'], weight: 9 },
+    { name: 'Pszenica 0,5', icon: '🍺', lines: ['Pszenica', '0,5'], weight: 4 },
+    { name: 'Lemoniada cytrynowa', icon: '🍋', lines: ['Lemoniada', 'cytrynowa'], weight: 9 },
+    { name: 'Chipsy', icon: '🥔', lines: ['Chipsy'], weight: 12 },
     { name: 'Nagroda pocieszenia', icon: '★', lines: ['Nagroda', 'pocieszenia'], weight: 35 },
     { name: 'Nagroda pocieszenia', icon: '★', lines: ['Nagroda', 'pocieszenia'], weight: 35 },
-    { name: 'Pils 0,3', icon: '🍺', lines: ['Pils', '0,3'], weight: 28 },
-    { name: 'Pils 0,5', icon: '🍺', lines: ['Pils', '0,5'], weight: 20 }
+    { name: 'Pils 0,3', icon: '🍺', lines: ['Pils', '0,3'], weight: 6 },
+    { name: 'Pils 0,5', icon: '🍺', lines: ['Pils', '0,5'], weight: 4 }
   ];
 
   const segmentAngle = 360 / prizes.length;
