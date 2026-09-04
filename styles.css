@@ -674,6 +674,7 @@ kbd {
     padding: .35rem .4rem;
     display: grid;
     grid-template-columns: 1.35rem minmax(0, 1fr);
+    grid-template-rows: auto auto;
     align-items: center;
     gap: .35rem;
     border-radius: .65rem;
@@ -695,6 +696,15 @@ kbd {
     background: var(--orange);
     font-size: .65rem;
     font-weight: 900;
+    grid-row: 1 / span 2;
+  }
+
+  .prize-key-name { min-width: 0; }
+
+  .prize-key-chance {
+    color: #675f57;
+    font-size: .75rem;
+    font-weight: 800;
   }
 }
 
