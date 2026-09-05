@@ -6,10 +6,18 @@ Interaktywne koło nagród z 13 równymi polami, realistyczną animacją obrotu 
 
 - 13 równych wizualnie pól i bezpieczne losowanie ważone,
 - płynna animacja z synchronizacją wskazówki,
+- przycisk „Zatrzymaj” z płynnym hamowaniem bez zmiany wylosowanej nagrody,
+- siedem języków, flagi i zapamiętywanie wyboru języka,
 - dźwięki, konfetti i historia wyników,
 - obsługa klawiatury, pełnego ekranu i preferencji ograniczonego ruchu,
 - responsywny interfejs oraz czytelna lista nagród na telefonach,
 - brak zależności i procesu budowania.
+
+## Języki i zatrzymywanie
+
+Menu pokazuje flagę oraz nazwę języka w jego własnym zapisie. Kolejność odpowiada orientacyjnej globalnej popularności: English, 日本語, 한국어, Polski, Українська, Čeština, Беларуская. Polski jest domyślny, a wybrany język zostaje zapamiętany w przeglądarce. Tłumaczenia obejmują koło, listę nagród, komunikaty, historię, ekran wygranej i etykiety dostępności.
+
+Przycisk „Zatrzymaj” skraca obrót do płynnego hamowania, trwającego najwyżej około 1,8 sekundy. Wynik jest losowany przy starcie, więc moment zatrzymania nie zmienia szans 30%/70%. Kolejne kliknięcia nie tworzą dodatkowych wyników. Spacja uruchamia lub zatrzymuje koło, jeśli fokus nie znajduje się na innym elemencie interaktywnym. Przy systemowym ograniczeniu animacji wynik pojawia się od razu.
 
 ## Prawdopodobieństwa
 
@@ -43,7 +51,23 @@ Następnie otwórz `http://localhost:8080`.
 - `index.html` — struktura aplikacji,
 - `styles.css` — wygląd i układ responsywny,
 - `app.js` — geometria koła, animacja i logika losowania,
+- `motion.js` — ruch koła i płynne zatrzymywanie,
+- `i18n.js` — słowniki siedmiu języków,
+- `flags/` — lokalne flagi SVG i ich licencja MIT,
+- `tests/core.test.cjs` — testy ruchu, tłumaczeń i zachowania aplikacji,
 - `favicon.svg` — ikona strony.
+
+Flagi pochodzą z projektu [flag-icons](https://github.com/lipis/flag-icons). Treść licencji znajduje się w `flags/LICENSE`.
+
+## Sprawdzenie i wdrożenie
+
+Testy nie wymagają instalowania zależności; uruchom je w Node.js 18 lub nowszym:
+
+```bash
+node --test tests/core.test.cjs
+```
+
+Przy wdrożeniu na własnym hostingu skopiuj razem `index.html`, `styles.css`, `app.js`, `motion.js`, `i18n.js`, `favicon.svg` oraz cały katalog `flags/`. Nowy HTML zawiera oznaczenie wersji zasobów, aby przeglądarki pobrały aktualny kod.
 
 ## Wersja online
 

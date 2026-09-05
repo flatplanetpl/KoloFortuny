@@ -1,0 +1,201 @@
+(() => {
+  'use strict';
+
+  // Approximate worldwide speaker order; Polish remains the default selection.
+  const languages = [
+    { code: 'en', name: 'English', flag: 'gb', locale: 'en-GB' },
+    { code: 'ja', name: '日本語', flag: 'jp', locale: 'ja-JP' },
+    { code: 'ko', name: '한국어', flag: 'kr', locale: 'ko-KR' },
+    { code: 'pl', name: 'Polski', flag: 'pl', locale: 'pl-PL' },
+    { code: 'uk', name: 'Українська', flag: 'ua', locale: 'uk-UA' },
+    { code: 'cs', name: 'Čeština', flag: 'cz', locale: 'cs-CZ' },
+    { code: 'be', name: 'Беларуская', flag: 'by', locale: 'be-BY' }
+  ];
+
+  const messages = {
+    pl: {
+      title: 'Koło nagród', subtitle: '13 równych pól',
+      description: 'Interaktywne koło nagród z płynnym obrotem i możliwością zatrzymania.',
+      home: 'Koło nagród — strona główna', settings: 'Ustawienia gry', language: 'Wybierz język',
+      gameTitle: 'Zakręć kołem i wygraj nagrodę', wheelLabel: 'Koło z 13 równymi wizualnie polami i ważonymi szansami nagród.',
+      panel: 'Panel losowania', space: 'Spacja', wheelHint: 'uruchamia lub zatrzymuje koło', prizesTitle: 'Nagrody i szanse',
+      state: 'Stan koła', readyTitle: 'Gotowe do losowania', readyCopy: 'Zakręć kołem i sprawdź swoją nagrodę.',
+      spinningTitle: 'Koło się kręci', spinningCopy: 'Możesz poczekać lub nacisnąć „Zatrzymaj”.',
+      stoppingTitle: 'Koło zwalnia', stoppingCopy: 'Jeszcze chwila — zaraz poznasz swoją nagrodę.',
+      spin: 'Zakręć kołem', spinning: 'Koło się kręci…', stop: 'Zatrzymaj', stopping: 'Zatrzymywanie…',
+      stopHint: 'Przycisk skraca obrót. Szanse nagród nie zmieniają się.',
+      fairnessTitle: 'Losowanie ważone', fairnessCopy: 'Nagrody rzeczowe 30% · pocieszenie 70%',
+      historyEyebrow: 'Ostatnie wyniki', historyTitle: 'Historia losowań', clearHistory: 'Wyczyść', emptyHistory: 'Pierwsza nagroda pojawi się tutaj.',
+      footer: 'Jedno losowanie · jedna nagroda', luck: 'Powodzenia!', congrats: 'Gratulacje!', win: 'Wygrywasz',
+      winnerTitle: 'Mamy zwycięzcę!', resultNote: 'Pokaż ten ekran obsłudze, aby odebrać nagrodę.', again: 'Zakręć ponownie', closeResult: 'Zamknij wynik',
+      soundOn: 'Włącz dźwięk', soundOff: 'Wyłącz dźwięk', fullscreenOn: 'Włącz pełny ekran', fullscreenOff: 'Wyłącz pełny ekran',
+      resultAnnouncement: 'Wynik losowania: {prize}', errorTitle: 'Nie udało się zakończyć losowania', errorCopy: 'Spróbuj ponownie.',
+      prizes: {
+        consolation: ['Nagroda pocieszenia', ['Nagroda', 'pocieszenia']],
+        drink: ['Dowolny drink alk/bezalk', ['Dowolny drink', 'alk/bezalk']],
+        wheat03: ['Pszenica 0,3', ['Pszenica', '0,3']], alcoholFree: ['Piwo bezalkoholowe', ['Piwo', 'bezalkoholowe']],
+        cucumber: ['Lemoniada ogórkowa', ['Lemoniada', 'ogórkowa']], wheat05: ['Pszenica 0,5', ['Pszenica', '0,5']],
+        lemon: ['Lemoniada cytrynowa', ['Lemoniada', 'cytrynowa']], chips: ['Chipsy', ['Chipsy']],
+        pils03: ['Pils 0,3', ['Pils', '0,3']], pils05: ['Pils 0,5', ['Pils', '0,5']]
+      }
+    },
+    en: {
+      title: 'Prize wheel', subtitle: '13 equal segments',
+      description: 'An interactive prize wheel with smooth spinning and a stop button.',
+      home: 'Prize wheel — home', settings: 'Game settings', language: 'Choose language',
+      gameTitle: 'Spin the wheel and win a prize', wheelLabel: 'A wheel with 13 visually equal segments and weighted prize probabilities.',
+      panel: 'Spin controls', space: 'Space', wheelHint: 'starts or stops the wheel', prizesTitle: 'Prizes and odds',
+      state: 'Wheel status', readyTitle: 'Ready to spin', readyCopy: 'Spin the wheel to discover your prize.',
+      spinningTitle: 'The wheel is spinning', spinningCopy: 'Wait for the result or press “Stop”.',
+      stoppingTitle: 'Slowing down', stoppingCopy: 'Your prize will be revealed in a moment.',
+      spin: 'Spin the wheel', spinning: 'Spinning…', stop: 'Stop', stopping: 'Stopping…',
+      stopHint: 'Stop shortens the spin. Prize odds stay the same.',
+      fairnessTitle: 'Weighted draw', fairnessCopy: 'Main prizes 30% · consolation prizes 70%',
+      historyEyebrow: 'Recent results', historyTitle: 'Spin history', clearHistory: 'Clear', emptyHistory: 'Your first prize will appear here.',
+      footer: 'One spin · one prize', luck: 'Good luck!', congrats: 'Congratulations!', win: 'You win',
+      winnerTitle: 'We have a winner!', resultNote: 'Show this screen to a member of staff to claim your prize.', again: 'Spin again', closeResult: 'Close result',
+      soundOn: 'Enable sound', soundOff: 'Mute sound', fullscreenOn: 'Enter full screen', fullscreenOff: 'Exit full screen',
+      resultAnnouncement: 'Spin result: {prize}', errorTitle: 'The spin could not be completed', errorCopy: 'Please try again.',
+      prizes: {
+        consolation: ['Consolation prize', ['Consolation', 'prize']],
+        drink: ['Any cocktail — with or without alcohol', ['Any cocktail', 'with/without', 'alcohol']],
+        wheat03: ['Wheat beer 0.3 L', ['Wheat beer', '0.3 L']], alcoholFree: ['Alcohol-free beer', ['Alcohol-free', 'beer']],
+        cucumber: ['Cucumber lemonade', ['Cucumber', 'lemonade']], wheat05: ['Wheat beer 0.5 L', ['Wheat beer', '0.5 L']],
+        lemon: ['Lemon lemonade', ['Lemon', 'lemonade']], chips: ['Crisps', ['Crisps']],
+        pils03: ['Pilsner 0.3 L', ['Pilsner', '0.3 L']], pils05: ['Pilsner 0.5 L', ['Pilsner', '0.5 L']]
+      }
+    },
+    ja: {
+      title: 'ラッキールーレット', subtitle: '13個の均等なマス',
+      description: 'なめらかに回転し、ストップボタンで止められる賞品ルーレット。',
+      home: 'ラッキールーレット — ホーム', settings: 'ゲーム設定', language: '言語を選択',
+      gameTitle: 'ルーレットを回して賞品を当てよう', wheelLabel: '見た目は均等な13個のマス。賞品ごとに当選確率が異なります。',
+      panel: 'ルーレット操作', space: 'スペース', wheelHint: 'キーで回転・停止', prizesTitle: '賞品と当選確率',
+      state: 'ルーレットの状態', readyTitle: '準備完了', readyCopy: 'ルーレットを回して賞品を当てましょう。',
+      spinningTitle: '回転中', spinningCopy: '結果を待つか「ストップ」を押してください。',
+      stoppingTitle: '減速中', stoppingCopy: 'もうすぐ賞品が決まります。',
+      spin: 'ルーレットを回す', spinning: '回転中…', stop: 'ストップ', stopping: '停止中…',
+      stopHint: 'ストップで回転時間を短縮できます。当選確率は変わりません。',
+      fairnessTitle: '賞品ごとに異なる当選確率', fairnessCopy: '通常賞品 30% · 残念賞 70%',
+      historyEyebrow: '最近の結果', historyTitle: '抽選履歴', clearHistory: '消去', emptyHistory: '最初の賞品がここに表示されます。',
+      footer: '1回の抽選につき賞品1つ', luck: '幸運を！', congrats: 'おめでとうございます！', win: '当選した賞品',
+      winnerTitle: '賞品が決まりました！', resultNote: '賞品を受け取るには、この画面をスタッフにお見せください。', again: 'もう一度回す', closeResult: '結果を閉じる',
+      soundOn: '音をオンにする', soundOff: '音をオフにする', fullscreenOn: '全画面表示', fullscreenOff: '全画面表示を終了',
+      resultAnnouncement: '抽選結果：{prize}', errorTitle: '抽選を完了できませんでした', errorCopy: 'もう一度お試しください。',
+      prizes: {
+        consolation: ['残念賞', ['残念賞']],
+        drink: ['お好きなカクテル（アルコール入り・ノンアルコール）', ['お好きな', 'カクテル', 'お酒あり／なし']],
+        wheat03: ['小麦ビール 0.3 L', ['小麦ビール', '0.3 L']], alcoholFree: ['ノンアルコールビール', ['ノンアルコール', 'ビール']],
+        cucumber: ['きゅうりレモネード', ['きゅうり', 'レモネード']], wheat05: ['小麦ビール 0.5 L', ['小麦ビール', '0.5 L']],
+        lemon: ['レモンレモネード', ['レモン', 'レモネード']], chips: ['ポテトチップス', ['ポテトチップス']],
+        pils03: ['ピルスナー 0.3 L', ['ピルスナー', '0.3 L']], pils05: ['ピルスナー 0.5 L', ['ピルスナー', '0.5 L']]
+      }
+    },
+    ko: {
+      title: '경품 룰렛', subtitle: '크기가 같은 13개 칸',
+      description: '부드럽게 회전하고 정지 버튼으로 멈출 수 있는 경품 룰렛입니다.',
+      home: '경품 룰렛 — 홈', settings: '게임 설정', language: '언어 선택',
+      gameTitle: '룰렛을 돌려 경품을 받으세요', wheelLabel: '크기가 같은 13개 칸으로 구성된 룰렛입니다. 경품별 당첨 확률은 다릅니다.',
+      panel: '룰렛 조작', space: '스페이스', wheelHint: '키로 시작하거나 멈출 수 있어요', prizesTitle: '경품 및 당첨 확률',
+      state: '룰렛 상태', readyTitle: '준비 완료', readyCopy: '룰렛을 돌려 경품을 확인하세요.',
+      spinningTitle: '룰렛이 돌아가고 있어요', spinningCopy: '결과를 기다리거나 “정지”를 누르세요.',
+      stoppingTitle: '룰렛이 느려지고 있어요', stoppingCopy: '잠시 후 경품이 공개됩니다.',
+      spin: '룰렛 돌리기', spinning: '회전 중…', stop: '정지', stopping: '멈추는 중…',
+      stopHint: '정지를 누르면 회전 시간이 줄어듭니다. 당첨 확률은 그대로입니다.',
+      fairnessTitle: '경품별 당첨 확률', fairnessCopy: '일반 경품 30% · 위로상 70%',
+      historyEyebrow: '최근 결과', historyTitle: '추첨 기록', clearHistory: '지우기', emptyHistory: '첫 번째 경품이 여기에 표시됩니다.',
+      footer: '한 번 돌릴 때마다 경품 하나', luck: '행운을 빌어요!', congrats: '축하합니다!', win: '당첨 경품',
+      winnerTitle: '경품이 나왔어요!', resultNote: '직원에게 이 화면을 보여 주고 경품을 받으세요.', again: '다시 돌리기', closeResult: '결과 닫기',
+      soundOn: '소리 켜기', soundOff: '소리 끄기', fullscreenOn: '전체 화면으로 보기', fullscreenOff: '전체 화면 종료',
+      resultAnnouncement: '추첨 결과: {prize}', errorTitle: '추첨을 완료하지 못했어요', errorCopy: '다시 시도해 주세요.',
+      prizes: {
+        consolation: ['위로상', ['위로상']],
+        drink: ['원하는 칵테일 — 알코올 또는 무알코올', ['원하는 칵테일', '알코올 또는', '무알코올']],
+        wheat03: ['밀맥주 0.3 L', ['밀맥주', '0.3 L']], alcoholFree: ['무알코올 맥주', ['무알코올', '맥주']],
+        cucumber: ['오이 레모네이드', ['오이', '레모네이드']], wheat05: ['밀맥주 0.5 L', ['밀맥주', '0.5 L']],
+        lemon: ['레몬 레모네이드', ['레몬', '레모네이드']], chips: ['감자칩', ['감자칩']],
+        pils03: ['필스너 0.3 L', ['필스너', '0.3 L']], pils05: ['필스너 0.5 L', ['필스너', '0.5 L']]
+      }
+    },
+    uk: {
+      title: 'Колесо призів', subtitle: '13 рівних секторів',
+      description: 'Інтерактивне колесо призів із плавним обертанням і кнопкою зупинки.',
+      home: 'Колесо призів — головна', settings: 'Налаштування гри', language: 'Вибрати мову',
+      gameTitle: 'Крутіть колесо та вигравайте приз', wheelLabel: 'Колесо з 13 візуально рівними секторами. Імовірності призів різні.',
+      panel: 'Керування розіграшем', space: 'Пробіл', wheelHint: 'запускає або зупиняє колесо', prizesTitle: 'Призи та шанси',
+      state: 'Стан колеса', readyTitle: 'Готове до розіграшу', readyCopy: 'Крутіть колесо та дізнайтеся свій приз.',
+      spinningTitle: 'Колесо обертається', spinningCopy: 'Зачекайте або натисніть «Зупинити».',
+      stoppingTitle: 'Колесо сповільнюється', stoppingCopy: 'Ще мить — і ви дізнаєтеся свій приз.',
+      spin: 'Крутити колесо', spinning: 'Колесо обертається…', stop: 'Зупинити', stopping: 'Зупиняється…',
+      stopHint: 'Кнопка скорочує обертання. Шанси на призи не змінюються.',
+      fairnessTitle: 'Призи з різними шансами', fairnessCopy: 'Основні призи 30% · втішні призи 70%',
+      historyEyebrow: 'Останні результати', historyTitle: 'Історія розіграшів', clearHistory: 'Очистити', emptyHistory: 'Ваш перший приз з’явиться тут.',
+      footer: 'Один розіграш · один приз', luck: 'Успіхів!', congrats: 'Вітаємо!', win: 'Ви виграли',
+      winnerTitle: 'Маємо переможця!', resultNote: 'Покажіть цей екран персоналу, щоб отримати приз.', again: 'Крутити знову', closeResult: 'Закрити результат',
+      soundOn: 'Увімкнути звук', soundOff: 'Вимкнути звук', fullscreenOn: 'На весь екран', fullscreenOff: 'Вийти з повноекранного режиму',
+      resultAnnouncement: 'Результат розіграшу: {prize}', errorTitle: 'Не вдалося завершити розіграш', errorCopy: 'Спробуйте ще раз.',
+      prizes: {
+        consolation: ['Втішний приз', ['Втішний', 'приз']],
+        drink: ['Будь-який коктейль — алкогольний або безалкогольний', ['Коктейль', 'алк. / безалк.']],
+        wheat03: ['Пшеничне пиво 0,3 л', ['Пшеничне', 'пиво 0,3 л']], alcoholFree: ['Безалкогольне пиво', ['Безалкогольне', 'пиво']],
+        cucumber: ['Огірковий лимонад', ['Огірковий', 'лимонад']], wheat05: ['Пшеничне пиво 0,5 л', ['Пшеничне', 'пиво 0,5 л']],
+        lemon: ['Лимонний лимонад', ['Лимонний', 'лимонад']], chips: ['Чипси', ['Чипси']],
+        pils03: ['Пільзнер 0,3 л', ['Пільзнер', '0,3 л']], pils05: ['Пільзнер 0,5 л', ['Пільзнер', '0,5 л']]
+      }
+    },
+    cs: {
+      title: 'Kolo štěstí', subtitle: '13 stejných polí',
+      description: 'Interaktivní kolo štěstí s plynulým otáčením a tlačítkem zastavení.',
+      home: 'Kolo štěstí — úvod', settings: 'Nastavení hry', language: 'Vybrat jazyk',
+      gameTitle: 'Roztočte kolo a vyhrajte cenu', wheelLabel: 'Kolo s 13 vizuálně stejnými poli a různými pravděpodobnostmi výher.',
+      panel: 'Ovládání losování', space: 'Mezerník', wheelHint: 'spustí nebo zastaví kolo', prizesTitle: 'Ceny a šance',
+      state: 'Stav kola', readyTitle: 'Připraveno k losování', readyCopy: 'Roztočte kolo a zjistěte svou výhru.',
+      spinningTitle: 'Kolo se točí', spinningCopy: 'Počkejte nebo stiskněte „Zastavit“.',
+      stoppingTitle: 'Kolo zpomaluje', stoppingCopy: 'Ještě chvilku — brzy zjistíte svou výhru.',
+      spin: 'Roztočit kolo', spinning: 'Kolo se točí…', stop: 'Zastavit', stopping: 'Zastavování…',
+      stopHint: 'Tlačítko zkrátí otáčení. Šance na výhru zůstávají stejné.',
+      fairnessTitle: 'Losování s různými šancemi', fairnessCopy: 'Hlavní ceny 30% · ceny útěchy 70%',
+      historyEyebrow: 'Poslední výsledky', historyTitle: 'Historie losování', clearHistory: 'Vymazat', emptyHistory: 'Vaše první výhra se objeví zde.',
+      footer: 'Jedno losování · jedna cena', luck: 'Hodně štěstí!', congrats: 'Gratulujeme!', win: 'Vyhráváte',
+      winnerTitle: 'Máme vítěze!', resultNote: 'Ukažte tuto obrazovku obsluze a vyzvedněte si výhru.', again: 'Roztočit znovu', closeResult: 'Zavřít výsledek',
+      soundOn: 'Zapnout zvuk', soundOff: 'Vypnout zvuk', fullscreenOn: 'Celá obrazovka', fullscreenOff: 'Ukončit celou obrazovku',
+      resultAnnouncement: 'Výsledek losování: {prize}', errorTitle: 'Losování se nepodařilo dokončit', errorCopy: 'Zkuste to znovu.',
+      prizes: {
+        consolation: ['Cena útěchy', ['Cena útěchy']],
+        drink: ['Libovolný koktejl — alkoholický i nealkoholický', ['Libovolný', 'koktejl', 'alko / nealko']],
+        wheat03: ['Pšeničné pivo 0,3 l', ['Pšeničné pivo', '0,3 l']], alcoholFree: ['Nealkoholické pivo', ['Nealkoholické', 'pivo']],
+        cucumber: ['Okurková limonáda', ['Okurková', 'limonáda']], wheat05: ['Pšeničné pivo 0,5 l', ['Pšeničné pivo', '0,5 l']],
+        lemon: ['Citronová limonáda', ['Citronová', 'limonáda']], chips: ['Brambůrky', ['Brambůrky']],
+        pils03: ['Pils 0,3 l', ['Pils', '0,3 l']], pils05: ['Pils 0,5 l', ['Pils', '0,5 l']]
+      }
+    },
+    be: {
+      title: 'Кола прызоў', subtitle: '13 роўных сектараў',
+      description: 'Інтэрактыўнае кола прызоў з плаўным кручэннем і кнопкай спынення.',
+      home: 'Кола прызоў — галоўная', settings: 'Налады гульні', language: 'Выбраць мову',
+      gameTitle: 'Круціце кола і выйгравайце прыз', wheelLabel: 'Кола з 13 візуальна роўнымі сектарамі. Імавернасці прызоў розныя.',
+      panel: 'Кіраванне розыгрышам', space: 'Прабел', wheelHint: 'запускае або спыняе кола', prizesTitle: 'Прызы і шанцы',
+      state: 'Стан кола', readyTitle: 'Гатова да розыгрышу', readyCopy: 'Круціце кола і даведайцеся пра свой прыз.',
+      spinningTitle: 'Кола круціцца', spinningCopy: 'Пачакайце або націсніце «Спыніць».',
+      stoppingTitle: 'Кола запавольваецца', stoppingCopy: 'Яшчэ імгненне — і вы даведаецеся пра свой прыз.',
+      spin: 'Круціць кола', spinning: 'Кола круціцца…', stop: 'Спыніць', stopping: 'Спыняецца…',
+      stopHint: 'Кнопка скарачае кручэнне. Шанцы на прызы не змяняюцца.',
+      fairnessTitle: 'Прызы з рознымі шанцамі', fairnessCopy: 'Асноўныя прызы 30% · суцяшальныя прызы 70%',
+      historyEyebrow: 'Апошнія вынікі', historyTitle: 'Гісторыя розыгрышаў', clearHistory: 'Ачысціць', emptyHistory: 'Ваш першы прыз з’явіцца тут.',
+      footer: 'Адзін розыгрыш · адзін прыз', luck: 'Поспехаў!', congrats: 'Віншуем!', win: 'Вы выйгралі',
+      winnerTitle: 'Маем пераможцу!', resultNote: 'Пакажыце гэты экран персаналу, каб атрымаць прыз.', again: 'Круціць зноў', closeResult: 'Закрыць вынік',
+      soundOn: 'Уключыць гук', soundOff: 'Выключыць гук', fullscreenOn: 'На ўвесь экран', fullscreenOff: 'Выйсці з поўнаэкраннага рэжыму',
+      resultAnnouncement: 'Вынік розыгрышу: {prize}', errorTitle: 'Не ўдалося завяршыць розыгрыш', errorCopy: 'Паспрабуйце яшчэ раз.',
+      prizes: {
+        consolation: ['Суцяшальны прыз', ['Суцяшальны', 'прыз']],
+        drink: ['Любы кактэйль — алкагольны або безалкагольны', ['Любы кактэйль', 'алк. / безалк.']],
+        wheat03: ['Пшанічнае піва 0,3 л', ['Пшанічнае', 'піва 0,3 л']], alcoholFree: ['Безалкагольнае піва', ['Безалкагольнае', 'піва']],
+        cucumber: ['Агурочны ліманад', ['Агурочны', 'ліманад']], wheat05: ['Пшанічнае піва 0,5 л', ['Пшанічнае', 'піва 0,5 л']],
+        lemon: ['Лімонны ліманад', ['Лімонны', 'ліманад']], chips: ['Чыпсы', ['Чыпсы']],
+        pils03: ['Пільзнер 0,3 л', ['Пільзнер', '0,3 л']], pils05: ['Пільзнер 0,5 л', ['Пільзнер', '0,5 л']]
+      }
+    }
+  };
+
+  window.WheelI18n = { languages, messages };
+})();

@@ -1,20 +1,22 @@
 (() => {
   'use strict';
 
+  const { languages, messages } = window.WheelI18n;
+
   const prizes = [
-    { name: 'Nagroda pocieszenia', icon: '★', lines: ['Nagroda', 'pocieszenia'], weight: 35 },
-    { name: 'Dowolny drink alk/bezalk', icon: '🍹', lines: ['Dowolny', 'drink', 'alk/bezalk'], weight: 4 },
-    { name: 'Nagroda pocieszenia', icon: '★', lines: ['Nagroda', 'pocieszenia'], weight: 35 },
-    { name: 'Pszenica 0,3', icon: '🍺', lines: ['Pszenica', '0,3'], weight: 6 },
-    { name: 'Piwo bezalkoholowe', icon: '🍺', lines: ['Piwo', 'bezalkoholowe'], weight: 6 },
-    { name: 'Lemoniada ogórkowa', icon: '🥒', lines: ['Lemoniada', 'ogórkowa'], weight: 9 },
-    { name: 'Pszenica 0,5', icon: '🍺', lines: ['Pszenica', '0,5'], weight: 4 },
-    { name: 'Lemoniada cytrynowa', icon: '🍋', lines: ['Lemoniada', 'cytrynowa'], weight: 9 },
-    { name: 'Chipsy', icon: '🥔', lines: ['Chipsy'], weight: 12 },
-    { name: 'Nagroda pocieszenia', icon: '★', lines: ['Nagroda', 'pocieszenia'], weight: 35 },
-    { name: 'Nagroda pocieszenia', icon: '★', lines: ['Nagroda', 'pocieszenia'], weight: 35 },
-    { name: 'Pils 0,3', icon: '🍺', lines: ['Pils', '0,3'], weight: 6 },
-    { name: 'Pils 0,5', icon: '🍺', lines: ['Pils', '0,5'], weight: 4 }
+    { id: 'consolation', name: 'Nagroda pocieszenia', icon: '★', weight: 35 },
+    { id: 'drink', name: 'Dowolny drink alk/bezalk', icon: '🍹', weight: 4 },
+    { id: 'consolation', name: 'Nagroda pocieszenia', icon: '★', weight: 35 },
+    { id: 'wheat03', name: 'Pszenica 0,3', icon: '🍺', weight: 6 },
+    { id: 'alcoholFree', name: 'Piwo bezalkoholowe', icon: '🍺', weight: 6 },
+    { id: 'cucumber', name: 'Lemoniada ogórkowa', icon: '🥒', weight: 9 },
+    { id: 'wheat05', name: 'Pszenica 0,5', icon: '🍺', weight: 4 },
+    { id: 'lemon', name: 'Lemoniada cytrynowa', icon: '🍋', weight: 9 },
+    { id: 'chips', name: 'Chipsy', icon: '🥔', weight: 12 },
+    { id: 'consolation', name: 'Nagroda pocieszenia', icon: '★', weight: 35 },
+    { id: 'consolation', name: 'Nagroda pocieszenia', icon: '★', weight: 35 },
+    { id: 'pils03', name: 'Pils 0,3', icon: '🍺', weight: 6 },
+    { id: 'pils05', name: 'Pils 0,5', icon: '🍺', weight: 4 }
   ];
 
   const segmentAngle = 360 / prizes.length;
@@ -35,6 +37,13 @@
   const spinButton = document.querySelector('#spinButton');
   const spinAgainButton = document.querySelector('#spinAgainButton');
   const spinLabel = document.querySelector('#spinLabel');
+  const stopButton = document.querySelector('#stopButton');
+  const stopLabel = document.querySelector('#stopLabel');
+  const languagePicker = document.querySelector('#languagePicker');
+  const languageToggle = document.querySelector('#languageToggle');
+  const languageOptions = document.querySelector('#languageOptions');
+  const languageFlag = document.querySelector('#languageFlag');
+  const languageName = document.querySelector('#languageName');
   const statusTitle = document.querySelector('#statusTitle');
   const statusCopy = document.querySelector('#statusCopy');
   const statusDot = document.querySelector('#statusDot');
@@ -52,8 +61,15 @@
   const localStore = storageArea('localStorage');
   const sessionStore = storageArea('sessionStorage');
 
+  let currentLanguage = storageGet(localStore, 'wheel-language') || 'pl';
+  if (!languages.some((language) => language.code === currentLanguage)) currentLanguage = 'pl';
   let rotation = normalize(Number(storageGet(sessionStore, 'wheel-rotation')) || 0);
+  let visualRotation = rotation;
   let spinning = false;
+  let stopRequested = false;
+  let stopAnimation = null;
+  let lastWinner = null;
+  let statusMode = 'ready';
   let soundEnabled = storageGet(localStore, 'wheel-sound') !== 'off';
   let audioContext = null;
   let tickFrame = 0;
@@ -61,17 +77,94 @@
   let history = readHistory();
   const uprightWheelContent = [];
 
-  wheel.setAttribute(
-    'aria-label',
-    'Koło nagród z 13 równymi wizualnie polami i ważonymi szansami nagród.'
-  );
-  buildWheel();
-  renderPrizeList();
-  wheel.style.transform = `rotate(${rotation}deg)`;
-  updateUprightWheelContent(rotation);
-  updateSoundButton();
-  renderHistory();
-  updateFullscreenButton();
+  renderLanguageOptions();
+  applyLanguage(currentLanguage);
+
+  function t(key) {
+    return messages[currentLanguage][key] ?? messages.pl[key];
+  }
+
+  function locale() {
+    return languages.find((language) => language.code === currentLanguage).locale;
+  }
+
+  function localizedPrize(prize) {
+    const [name, lines] = t('prizes')[prize.id];
+    return { ...prize, name, lines };
+  }
+
+  function renderLanguageOptions() {
+    const fragment = document.createDocumentFragment();
+    languages.forEach((language) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.dataset.language = language.code;
+      const flag = document.createElement('img');
+      flag.src = `./flags/${language.flag}.svg`;
+      flag.alt = '';
+      flag.width = 24;
+      flag.height = 18;
+      const name = document.createElement('span');
+      name.lang = language.code;
+      name.textContent = language.name;
+      const check = document.createElement('span');
+      check.className = 'language-check';
+      check.setAttribute('aria-hidden', 'true');
+      check.textContent = '✓';
+      button.append(flag, name, check);
+      button.addEventListener('click', () => {
+        applyLanguage(language.code);
+        storageSet(localStore, 'wheel-language', language.code);
+        languagePicker.open = false;
+        languageToggle.focus();
+      });
+      fragment.append(button);
+    });
+    languageOptions.replaceChildren(fragment);
+  }
+
+  function applyLanguage(code) {
+    if (!languages.some((language) => language.code === code)) return;
+    currentLanguage = code;
+    document.documentElement.lang = code;
+    document.title = t('title');
+    document.querySelector('meta[name="description"]').setAttribute('content', t('description'));
+    document.querySelectorAll('[data-i18n]').forEach((element) => {
+      element.textContent = t(element.dataset.i18n);
+    });
+    document.querySelectorAll('[data-i18n-aria]').forEach((element) => {
+      element.setAttribute('aria-label', t(element.dataset.i18nAria));
+    });
+    const language = languages.find((item) => item.code === code);
+    languageFlag.src = `./flags/${language.flag}.svg`;
+    languageName.textContent = language.name;
+    languageName.lang = code;
+    languageOptions.querySelectorAll('button').forEach((button) => {
+      button.setAttribute('aria-pressed', String(button.dataset.language === code));
+    });
+    buildWheel();
+    renderPrizeList();
+    renderWheel(visualRotation);
+    renderHistory();
+    updateStatus();
+    updateSoundButton();
+    updateFullscreenButton();
+    if (lastWinner) resultPrize.textContent = localizedPrize(lastWinner).name;
+  }
+
+  function updateStatus() {
+    spinLabel.textContent = spinning ? t('spinning') : t('spin');
+    stopLabel.textContent = stopRequested ? t('stopping') : t('stop');
+    const mode = spinning ? (stopRequested ? 'stopping' : 'spinning') : statusMode;
+    statusTitle.textContent = mode === 'result' ? t('winnerTitle') : t(`${mode}Title`);
+    statusCopy.textContent = mode === 'result' && lastWinner ? localizedPrize(lastWinner).name : t(`${mode}Copy`);
+  }
+
+  function renderWheel(angle) {
+    visualRotation = angle;
+    wheel.style.transform = `rotate(${angle}deg)`;
+    updateUprightWheelContent(angle);
+  }
 
   function svgElement(name, attributes = {}) {
     const element = document.createElementNS('http://www.w3.org/2000/svg', name);
@@ -152,8 +245,9 @@
     }
     fragment.append(dots);
 
-    prizes.forEach((prize, index) => {
+    prizes.forEach((definition, index) => {
       const angle = sectorCenter(index);
+      const prize = localizedPrize(definition);
       const iconPoint = pointOnCircle(216, angle);
       const labelPoint = pointOnCircle(326, angle);
 
@@ -169,8 +263,10 @@
       uprightWheelContent.push({ element: icon, point: iconPoint });
       fragment.append(icon);
 
-      const longestLine = Math.max(...prize.lines.map((line) => line.length));
-      const fontSize = longestLine >= 13 ? 16 : longestLine >= 11 ? 20 : longestLine >= 9 ? 21 : 24;
+      const longestLine = Math.max(...prize.lines.map((line) => [...line].reduce(
+        (width, character) => width + (/[\u2e80-\u9fff\uac00-\ud7af\uff00-\uffef]/u.test(character) ? 1 : .62), 0
+      )));
+      const fontSize = Math.max(16, Math.min(24, Math.floor(138 / longestLine)));
       const lineHeight = fontSize * 1.08;
       const text = svgElement('text', {
         x: labelPoint.x.toFixed(3),
@@ -228,7 +324,7 @@
       const item = document.createElement('li');
       const name = document.createElement('span');
       name.className = 'prize-key-name';
-      name.textContent = prize.name;
+      name.textContent = localizedPrize(prize).name;
 
       const chance = document.createElement('span');
       chance.className = 'prize-key-chance';
@@ -269,9 +365,9 @@
   }
 
   function formatChance(weight) {
-    return `${(weight / totalPrizeWeight * 100).toLocaleString('pl-PL', {
-      maximumFractionDigits: 2
-    })}%`;
+    return (weight / totalPrizeWeight).toLocaleString(locale(), {
+      style: 'percent', maximumFractionDigits: 2
+    });
   }
 
   function storageArea(name) {
@@ -303,7 +399,11 @@
   function readHistory() {
     try {
       const stored = JSON.parse(storageGet(localStore, 'wheel-history') || '[]');
-      return Array.isArray(stored) ? stored.slice(0, 8) : [];
+      if (!Array.isArray(stored)) return [];
+      return stored.filter((entry) => entry && typeof entry === 'object').slice(0, 8).map((entry) => {
+        const prize = prizes.find((item) => item.id === entry.id || item.name === entry.name);
+        return prize ? { ...entry, id: prize.id, icon: prize.icon } : entry;
+      });
     } catch {
       return [];
     }
@@ -320,7 +420,7 @@
     if (!history.length) {
       const empty = document.createElement('li');
       empty.className = 'empty-history';
-      empty.textContent = 'Pierwsza nagroda pojawi się tutaj.';
+      empty.textContent = t('emptyHistory');
       historyList.append(empty);
       return;
     }
@@ -336,12 +436,15 @@
 
       const name = document.createElement('span');
       name.className = 'history-name';
-      name.textContent = entry.name;
+      const prize = prizes.find((item) => item.id === entry.id);
+      name.textContent = prize ? localizedPrize(prize).name : entry.name;
 
       const time = document.createElement('time');
       time.className = 'history-time';
       time.dateTime = entry.iso;
-      time.textContent = entry.time;
+      const date = new Date(entry.iso);
+      time.textContent = Number.isNaN(date.getTime()) ? (entry.time || '')
+        : date.toLocaleTimeString(locale(), { hour: '2-digit', minute: '2-digit' });
 
       item.append(emoji, name, time);
       historyList.append(item);
@@ -351,10 +454,11 @@
   function addHistory(prize) {
     const now = new Date();
     history.unshift({
+      id: prize.id,
       name: prize.name,
       icon: prize.icon,
       iso: now.toISOString(),
-      time: now.toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' })
+      time: now.toLocaleTimeString(locale(), { hour: '2-digit', minute: '2-digit' })
     });
     history = history.slice(0, 8);
     saveHistory();
@@ -415,12 +519,13 @@
   function animateWheel(startRotation, target, duration) {
     // One clock updates the disc and upright content in the same paint.
     if (reducedMotion.matches) {
-      wheel.style.transform = `rotate(${target}deg)`;
-      updateUprightWheelContent(target);
-      return Promise.resolve();
+      renderWheel(target);
+      return Promise.resolve(target);
     }
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
+      const motion = window.WheelMotion.createMotion(startRotation, target, duration);
       const startTime = performance.now();
+      stopAnimation = () => motion.stop(performance.now() - startTime);
       let previousTime = startTime;
       let previousAngle = startRotation;
       const phase = modulo(
@@ -430,20 +535,22 @@
       if (nextBoundary <= startRotation + .001) nextBoundary += segmentAngle;
 
       const frame = (now) => {
-        const progress = Math.min(1, Math.max(0, (now - startTime) / duration));
-        // Smooth acceleration and longer deceleration, with no final recoil.
-        const eased = 1 - (1 - progress) ** 4 * (1 + 4 * progress);
-        const angle = startRotation + (target - startRotation) * eased;
-        wheel.style.transform = `rotate(${angle}deg)`;
-        updateUprightWheelContent(angle);
-        if (angle >= nextBoundary) {
-          playTick((angle - previousAngle) / Math.max(1, now - previousTime) * 1000);
-          nextBoundary += (Math.floor((angle - nextBoundary) / segmentAngle) + 1) * segmentAngle;
+        try {
+          const sample = motion.sample(now - startTime);
+          const angle = sample.angle;
+          renderWheel(angle);
+          if (angle >= nextBoundary) {
+            playTick((angle - previousAngle) / Math.max(1, now - previousTime) * 1000);
+            nextBoundary += (Math.floor((angle - nextBoundary) / segmentAngle) + 1) * segmentAngle;
+          }
+          previousAngle = angle;
+          previousTime = now;
+          if (!sample.done) tickFrame = requestAnimationFrame(frame);
+          else { stopAnimation = null; resolve(angle); }
+        } catch (error) {
+          stopAnimation = null;
+          reject(error);
         }
-        previousAngle = angle;
-        previousTime = now;
-        if (progress < 1) tickFrame = requestAnimationFrame(frame);
-        else resolve();
       };
       tickFrame = requestAnimationFrame(frame);
     });
@@ -453,9 +560,18 @@
     spinning = value;
     spinButton.disabled = value;
     spinAgainButton.disabled = value;
+    stopButton.disabled = !value || stopRequested || reducedMotion.matches;
     wheelStage.classList.toggle('is-spinning', value);
     statusDot.classList.toggle('is-busy', value);
-    spinLabel.textContent = value ? 'Koło się kręci…' : 'Zakręć kołem';
+    updateStatus();
+  }
+
+  function stopSpin() {
+    if (!spinning || stopRequested || !stopAnimation) return;
+    stopRequested = true;
+    stopAnimation();
+    stopButton.disabled = true;
+    updateStatus();
   }
 
   function normalize(value) {
@@ -465,39 +581,46 @@
   async function spin() {
     if (spinning) return;
     if (resultDialog.open) resultDialog.close();
+    stopRequested = false;
     setBusy(true);
-    ensureAudio();
 
-    statusTitle.textContent = 'Koło się kręci';
-    statusCopy.textContent = 'Jeszcze chwila — zapadka już szuka zwycięskiego pola.';
+    try {
+      ensureAudio();
+      const winnerIndex = weightedPrizeIndex();
+      const winner = prizes[winnerIndex];
+      const safeJitter = (secureRandom() - .5) * segmentAngle * .56;
+      const desiredModulo = normalize(pointerAngle - sectorCenter(winnerIndex) + safeJitter);
+      const currentModulo = normalize(rotation);
+      const correction = normalize(desiredModulo - currentModulo);
+      const fullTurns = reducedMotion.matches ? 0 : 7 + randomInt(4);
+      const target = rotation + fullTurns * 360 + correction;
+      const duration = reducedMotion.matches ? 1 : 6500 + randomInt(2100);
 
-    const winnerIndex = weightedPrizeIndex();
-    const winner = prizes[winnerIndex];
-    const safeJitter = (secureRandom() - .5) * segmentAngle * .56;
-    const desiredModulo = normalize(pointerAngle - sectorCenter(winnerIndex) + safeJitter);
-    const currentModulo = normalize(rotation);
-    const correction = normalize(desiredModulo - currentModulo);
-    const fullTurns = reducedMotion.matches ? 0 : 7 + randomInt(4);
-    const target = rotation + fullTurns * 360 + correction;
-    const duration = reducedMotion.matches ? 1 : 6500 + randomInt(2100);
+      const finalAngle = await animateWheel(rotation, target, duration);
 
-    await animateWheel(rotation, target, duration);
+      rotation = normalize(finalAngle);
+      renderWheel(rotation);
+      storageSet(sessionStore, 'wheel-rotation', String(rotation));
 
-    rotation = normalize(target);
-    wheel.style.transform = `rotate(${rotation}deg)`;
-    updateUprightWheelContent(rotation);
-    storageSet(sessionStore, 'wheel-rotation', String(rotation));
-
-    setBusy(false);
-    statusTitle.textContent = 'Mamy zwycięzcę!';
-    statusCopy.textContent = winner.name;
-    announcer.textContent = `Wynik losowania: ${winner.name}`;
-    addHistory(winner);
-    showResult(winner);
+      lastWinner = winner;
+      statusMode = 'result';
+      announcer.textContent = t('resultAnnouncement').replace('{prize}', localizedPrize(winner).name);
+      addHistory(winner);
+      showResult(winner);
+    } catch {
+      cancelAnimationFrame(tickFrame);
+      rotation = normalize(visualRotation);
+      renderWheel(rotation);
+      statusMode = 'error';
+    } finally {
+      stopAnimation = null;
+      stopRequested = false;
+      setBusy(false);
+    }
   }
 
   function showResult(prize) {
-    resultPrize.textContent = prize.name;
+    resultPrize.textContent = localizedPrize(prize).name;
     resultIcon.textContent = prize.icon;
     playWin();
     if (navigator.vibrate) navigator.vibrate([45, 35, 90]);
@@ -562,15 +685,19 @@
 
   function updateSoundButton() {
     soundButton.setAttribute('aria-pressed', String(soundEnabled));
-    soundButton.setAttribute('aria-label', soundEnabled ? 'Wyłącz dźwięk' : 'Włącz dźwięk');
+    soundButton.setAttribute('aria-label', soundEnabled ? t('soundOff') : t('soundOn'));
   }
 
   function updateFullscreenButton() {
     const active = Boolean(document.fullscreenElement);
-    fullscreenButton.setAttribute('aria-label', active ? 'Wyłącz pełny ekran' : 'Włącz pełny ekran');
+    fullscreenButton.setAttribute('aria-label', active ? t('fullscreenOff') : t('fullscreenOn'));
   }
 
   spinButton.addEventListener('click', spin);
+  stopButton.addEventListener('click', stopSpin);
+  document.addEventListener('click', (event) => {
+    if (!languagePicker.contains(event.target)) languagePicker.open = false;
+  });
   spinAgainButton.addEventListener('click', () => {
     resultDialog.close();
     spin();
@@ -606,10 +733,16 @@
   document.addEventListener('fullscreenchange', updateFullscreenButton);
 
   document.addEventListener('keydown', (event) => {
-    if (event.code !== 'Space' || event.repeat || spinning || resultDialog.open) return;
-    if (event.target?.closest?.('a, button, input, textarea, select, [contenteditable]')) return;
+    if (event.key === 'Escape' && languagePicker.open) {
+      languagePicker.open = false;
+      languageToggle.focus();
+      return;
+    }
+    if (event.code !== 'Space' || event.repeat || resultDialog.open) return;
+    if (event.target?.closest?.('a, button, summary, input, textarea, select, [contenteditable]')) return;
     event.preventDefault();
-    spin();
+    if (spinning) stopSpin();
+    else spin();
   });
 
 })();

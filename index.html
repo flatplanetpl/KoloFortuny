@@ -7,22 +7,30 @@
     <meta name="description" content="Interaktywne koło nagród z realistyczną animacją losowania." />
     <title>Koło nagród</title>
     <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="./styles.css?v=20260905-scroll-fix" />
+    <link rel="stylesheet" href="./styles.css?v=20260905-languages-stop" />
   </head>
   <body>
     <canvas id="confetti" class="confetti" aria-hidden="true"></canvas>
 
     <main class="app-shell">
       <header class="topbar">
-        <a class="brand" href="./" aria-label="Koło nagród — strona główna">
+        <a class="brand" href="./" aria-label="Koło nagród — strona główna" data-i18n-aria="home">
           <span class="brand-mark" aria-hidden="true">★</span>
           <span>
-            <strong>Koło nagród</strong>
-            <small>13 równych pól</small>
+            <strong data-i18n="title">Koło nagród</strong>
+            <small data-i18n="subtitle">13 równych pól</small>
           </span>
         </a>
 
-        <div class="top-actions" aria-label="Ustawienia gry">
+        <div class="top-actions" aria-label="Ustawienia gry" data-i18n-aria="settings">
+          <details id="languagePicker" class="language-picker">
+            <summary id="languageToggle" aria-label="Wybierz język" data-i18n-aria="language">
+              <img id="languageFlag" src="./flags/pl.svg" alt="" width="24" height="18" />
+              <span id="languageName" lang="pl">Polski</span>
+              <span class="language-chevron" aria-hidden="true">⌄</span>
+            </summary>
+            <div id="languageOptions" class="language-options" role="group" aria-label="Wybierz język" data-i18n-aria="language"></div>
+          </details>
           <button id="soundButton" class="icon-button" type="button" aria-pressed="true" aria-label="Wyłącz dźwięk">
             <svg class="sound-on" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6.8 8.5H3.5v7h3.3L11 19V5Zm4.5 3.2a5.5 5.5 0 0 1 0 7.6M18 5.6a9 9 0 0 1 0 12.8"/></svg>
             <svg class="sound-off" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6.8 8.5H3.5v7h3.3L11 19V5Zm4 5 5 5m0-5-5 5"/></svg>
@@ -35,19 +43,20 @@
 
       <section class="game-layout" aria-labelledby="gameTitle">
         <div class="wheel-column">
-          <h1 id="gameTitle" class="sr-only">Zakręć kołem i wygraj nagrodę</h1>
-          <div id="wheelStage" class="wheel-stage" aria-label="Koło z trzynastoma równymi polami">
+          <h1 id="gameTitle" class="sr-only" data-i18n="gameTitle">Zakręć kołem i wygraj nagrodę</h1>
+          <div id="wheelStage" class="wheel-stage">
             <span class="motion-lines motion-lines-left" aria-hidden="true"></span>
             <span class="motion-lines motion-lines-right" aria-hidden="true"></span>
             <div class="wheel-viewport">
-            <div
-              id="wheel"
-              class="wheel"
-              role="img"
-              aria-label="Koło nagród: piwo, lemoniada, chipsy, drink i nagrody pocieszenia"
-            >
-              <svg id="wheelSvg" viewBox="0 0 1000 1000" aria-hidden="true"></svg>
-            </div>
+              <div
+                id="wheel"
+                class="wheel"
+                role="img"
+                aria-label="Koło z 13 równymi wizualnie polami i ważonymi szansami nagród."
+                data-i18n-aria="wheelLabel"
+              >
+                <svg id="wheelSvg" viewBox="0 0 1000 1000" aria-hidden="true"></svg>
+              </div>
             </div>
             <div class="wheel-pointer" aria-hidden="true">
               <svg viewBox="0 0 100 124">
@@ -56,19 +65,19 @@
               </svg>
             </div>
           </div>
-          <p class="wheel-hint"><kbd>Spacja</kbd> też uruchamia losowanie</p>
+          <p class="wheel-hint"><kbd data-i18n="space">Spacja</kbd> <span data-i18n="wheelHint">uruchamia lub zatrzymuje koło</span></p>
           <section class="wheel-prize-key" aria-labelledby="wheelPrizeKeyTitle">
-            <h2 id="wheelPrizeKeyTitle">Nagrody na kole</h2>
+            <h2 id="wheelPrizeKeyTitle" data-i18n="prizesTitle">Nagrody i szanse</h2>
             <ol id="wheelPrizeList" class="wheel-prize-list"></ol>
           </section>
         </div>
 
-        <aside class="control-panel" aria-label="Panel losowania">
+        <aside class="control-panel" aria-label="Panel losowania" data-i18n-aria="panel">
           <div class="status-block" role="status" aria-live="polite" aria-atomic="true">
             <span id="statusDot" class="status-dot" aria-hidden="true"></span>
-            <p class="eyebrow">Stan koła</p>
+            <p class="eyebrow" data-i18n="state">Stan koła</p>
             <h2 id="statusTitle">Gotowe do losowania</h2>
-            <p id="statusCopy">Szanse nagród są dopasowane orientacyjnie do ich wartości.</p>
+            <p id="statusCopy">Zakręć kołem i sprawdź swoją nagrodę.</p>
           </div>
 
           <button id="spinButton" class="spin-button" type="button">
@@ -77,32 +86,38 @@
             <span id="spinLabel">Zakręć kołem</span>
           </button>
 
-          <div class="fairness-row" aria-label="Informacja o losowaniu">
+          <button id="stopButton" class="stop-button" type="button" aria-describedby="stopHint" disabled>
+            <span aria-hidden="true">■</span>
+            <span id="stopLabel">Zatrzymaj</span>
+          </button>
+          <p id="stopHint" class="stop-hint" data-i18n="stopHint">Przycisk skraca obrót. Szanse nagród nie zmieniają się.</p>
+
+          <div class="fairness-row">
             <span class="shield" aria-hidden="true">
               <svg viewBox="0 0 24 24"><path d="m12 3 7 3v5.5c0 4.3-2.8 7.6-7 9.5-4.2-1.9-7-5.2-7-9.5V6l7-3Zm-3 9 2 2 4-4"/></svg>
             </span>
-            <span><strong>Losowanie ważone</strong><small>Dokładne szanse znajdziesz na liście nagród</small></span>
+            <span><strong data-i18n="fairnessTitle">Losowanie ważone</strong><small data-i18n="fairnessCopy">Nagrody rzeczowe 30% · pocieszenie 70%</small></span>
           </div>
 
           <section class="history-section" aria-labelledby="historyTitle">
             <div class="section-heading">
               <div>
-                <p class="eyebrow">Ostatnie wyniki</p>
-                <h2 id="historyTitle">Historia losowań</h2>
+                <p class="eyebrow" data-i18n="historyEyebrow">Ostatnie wyniki</p>
+                <h2 id="historyTitle" data-i18n="historyTitle">Historia losowań</h2>
               </div>
-              <button id="clearHistoryButton" class="text-button" type="button" hidden>Wyczyść</button>
+              <button id="clearHistoryButton" class="text-button" type="button" hidden data-i18n="clearHistory">Wyczyść</button>
             </div>
             <ol id="historyList" class="history-list">
-              <li class="empty-history">Pierwsza nagroda pojawi się tutaj.</li>
+              <li class="empty-history" data-i18n="emptyHistory">Pierwsza nagroda pojawi się tutaj.</li>
             </ol>
           </section>
         </aside>
       </section>
 
       <footer class="footer">
-        <span>Jedno losowanie · jedna nagroda</span>
+        <span data-i18n="footer">Jedno losowanie · jedna nagroda</span>
         <span aria-hidden="true">✦</span>
-        <span>Powodzenia!</span>
+        <span data-i18n="luck">Powodzenia!</span>
       </footer>
     </main>
 
@@ -110,15 +125,17 @@
 
     <dialog id="resultDialog" class="result-dialog" aria-labelledby="resultTitle resultPrize" aria-describedby="resultNote">
       <div class="dialog-glow" aria-hidden="true"></div>
-      <button id="closeDialogButton" class="dialog-close" type="button" aria-label="Zamknij wynik">×</button>
+      <button id="closeDialogButton" class="dialog-close" type="button" aria-label="Zamknij wynik" data-i18n-aria="closeResult">×</button>
       <div id="resultIcon" class="result-icon" aria-hidden="true">★</div>
-      <p class="eyebrow">Gratulacje!</p>
-      <h2 id="resultTitle">Wygrywasz</h2>
+      <p class="eyebrow" data-i18n="congrats">Gratulacje!</p>
+      <h2 id="resultTitle" data-i18n="win">Wygrywasz</h2>
       <p id="resultPrize" class="result-prize"></p>
-      <p id="resultNote" class="result-note">Pokaż ten ekran obsłudze, aby odebrać nagrodę.</p>
-      <button id="spinAgainButton" class="dialog-action" type="button">Zakręć ponownie</button>
+      <p id="resultNote" class="result-note" data-i18n="resultNote">Pokaż ten ekran obsłudze, aby odebrać nagrodę.</p>
+      <button id="spinAgainButton" class="dialog-action" type="button" data-i18n="again">Zakręć ponownie</button>
     </dialog>
 
-    <script src="./app.js"></script>
+    <script src="./i18n.js?v=20260905-languages-stop"></script>
+    <script src="./motion.js?v=20260905-languages-stop"></script>
+    <script src="./app.js?v=20260905-languages-stop"></script>
   </body>
 </html>
