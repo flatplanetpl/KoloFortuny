@@ -408,69 +408,45 @@
     tone(783.99, .48, .04, .22);
   }
 
-  function currentVisualRotation() {
-    const transform = getComputedStyle(wheel).transform;
-    if (!transform || transform === 'none') return rotation;
-
-    const Matrix = window.DOMMatrixReadOnly || window.DOMMatrix || window.WebKitCSSMatrix;
-    if (Matrix) {
-      try {
-        const matrix = new Matrix(transform);
-        let angle = Math.atan2(matrix.b, matrix.a) * (180 / Math.PI);
-        if (angle < 0) angle += 360;
-        return angle;
-      } catch {
-        // Fall through to the broadly supported 2D matrix parser.
-      }
-    }
-
-    const values = transform.match(/matrix\(([^)]+)\)/);
-    if (!values) return rotation;
-    const [a, b] = values[1].split(',').map(Number);
-    let angle = Math.atan2(b, a) * (180 / Math.PI);
-    if (angle < 0) angle += 360;
-    return angle;
-  }
-
   function modulo(value, base) {
     return ((value % base) + base) % base;
   }
 
-  function monitorTicks(animation, startRotation) {
-    let previousAngle = normalize(startRotation);
-    let previousTime = performance.now();
-    let accumulated = 0;
-    const separatorPhase = modulo(
-      pointerAngle - (firstSectorCenter - segmentAngle / 2),
-      segmentAngle
-    );
-    let nextBoundary = modulo(separatorPhase - modulo(startRotation, segmentAngle), segmentAngle);
-    if (nextBoundary < .001) nextBoundary = segmentAngle;
+  function animateWheel(startRotation, target, duration) {
+    // One clock updates the disc and upright content in the same paint.
+    if (reducedMotion.matches) {
+      wheel.style.transform = `rotate(${target}deg)`;
+      updateUprightWheelContent(target);
+      return Promise.resolve();
+    }
+    return new Promise((resolve) => {
+      const startTime = performance.now();
+      let previousTime = startTime;
+      let previousAngle = startRotation;
+      const phase = modulo(
+        pointerAngle - (firstSectorCenter - segmentAngle / 2), segmentAngle
+      );
+      let nextBoundary = startRotation + modulo(phase - startRotation, segmentAngle);
+      if (nextBoundary <= startRotation + .001) nextBoundary += segmentAngle;
 
-    const frame = (now) => {
-      const angle = currentVisualRotation();
-      updateUprightWheelContent(angle);
-      let delta = angle - previousAngle;
-      if (delta < -180) delta += 360;
-      if (delta > 180) delta -= 360;
-      const elapsed = Math.max(1, now - previousTime);
-      const speed = Math.abs(delta) / elapsed * 1000;
-      accumulated += Math.max(0, delta);
-      if (accumulated + .001 >= nextBoundary) {
-        playTick(speed);
-        do {
-          nextBoundary += segmentAngle;
-        } while (nextBoundary <= accumulated);
-      }
-      previousAngle = angle;
-      previousTime = now;
-
-      if (animation.playState !== 'finished' && animation.playState !== 'idle') {
-        tickFrame = requestAnimationFrame(frame);
-      }
-    };
-
-    tickFrame = requestAnimationFrame(frame);
+      const frame = (now) => {
+        const progress = Math.min(1, Math.max(0, (now - startTime) / duration));
+        // Smooth acceleration and longer deceleration, with no final recoil.
+        const eased = 1 - (1 - progress) ** 4 * (1 + 4 * progress);
+        const angle = startRotation + (target - startRotation) * eased;
+        wheel.style.transform = `rotate(${angle}deg)`;
+        updateUprightWheelContent(angle);
+        if (angle >= nextBoundary) {
+          playTick((angle - previousAngle) / Math.max(1, now - previousTime) * 1000);
+          nextBoundary += (Math.floor((angle - nextBoundary) / segmentAngle) + 1) * segmentAngle;
+        }
+        previousAngle = angle;
+        previousTime = now;
+        if (progress < 1) tickFrame = requestAnimationFrame(frame);
+        else resolve();
+      };
+      tickFrame = requestAnimationFrame(frame);
+    });
   }
 
   function setBusy(value) {
@@ -505,30 +481,10 @@
     const target = rotation + fullTurns * 360 + correction;
     const duration = reducedMotion.matches ? 1 : 6500 + randomInt(2100);
 
-    const animation = wheel.animate(
-      [
-        { transform: `rotate(${rotation}deg)`, offset: 0, easing: 'cubic-bezier(.38,0,.72,.28)' },
-        { transform: `rotate(${rotation + 92}deg)`, offset: .11, easing: 'cubic-bezier(.16,.73,.22,1)' },
-        { transform: `rotate(${target - 13}deg)`, offset: .9, easing: 'cubic-bezier(.18,.82,.25,1)' },
-        { transform: `rotate(${target + 2.2}deg)`, offset: .975, easing: 'ease-out' },
-        { transform: `rotate(${target}deg)`, offset: 1 }
-      ],
-      { duration, fill: 'forwards' }
-    );
+    await animateWheel(rotation, target, duration);
 
-    if (!reducedMotion.matches) monitorTicks(animation, rotation);
-
-    try {
-      await animation.finished;
-    } catch {
-      setBusy(false);
-      return;
-    }
-
-    cancelAnimationFrame(tickFrame);
     rotation = normalize(target);
     wheel.style.transform = `rotate(${rotation}deg)`;
-    animation.cancel();
     updateUprightWheelContent(rotation);
     storageSet(sessionStore, 'wheel-rotation', String(rotation));
 
