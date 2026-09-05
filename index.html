@@ -7,7 +7,7 @@
     <meta name="description" content="Interaktywne koło nagród z realistyczną animacją losowania." />
     <title>Koło nagród</title>
     <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="./styles.css?v=20260905-scroll-fix" />
   </head>
   <body>
     <canvas id="confetti" class="confetti" aria-hidden="true"></canvas>
@@ -39,6 +39,7 @@
           <div id="wheelStage" class="wheel-stage" aria-label="Koło z trzynastoma równymi polami">
             <span class="motion-lines motion-lines-left" aria-hidden="true"></span>
             <span class="motion-lines motion-lines-right" aria-hidden="true"></span>
+            <div class="wheel-viewport">
             <div
               id="wheel"
               class="wheel"
@@ -46,6 +47,7 @@
               aria-label="Koło nagród: piwo, lemoniada, chipsy, drink i nagrody pocieszenia"
             >
               <svg id="wheelSvg" viewBox="0 0 1000 1000" aria-hidden="true"></svg>
+            </div>
             </div>
             <div class="wheel-pointer" aria-hidden="true">
               <svg viewBox="0 0 100 124">
