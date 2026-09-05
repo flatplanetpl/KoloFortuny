@@ -25,6 +25,11 @@
 html {
   min-width: 320px;
   min-height: 100%;
+  scrollbar-gutter: stable;
+}
+
+@supports not (scrollbar-gutter: stable) {
+  html { overflow-y: scroll; }
 }
 
 body {
@@ -174,6 +179,16 @@ button, a { -webkit-tap-highlight-color: transparent; }
   border-radius: 50%;
   box-shadow: 0 1.55rem 1.25rem rgba(117, 65, 35, .2);
   pointer-events: none;
+}
+
+/* Clip the rotating square without clipping the stationary shadow or pointer. */
+.wheel-viewport {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  contain: paint;
+  border-radius: 50%;
 }
 
 .wheel {
