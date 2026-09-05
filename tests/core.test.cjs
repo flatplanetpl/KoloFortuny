@@ -47,6 +47,10 @@ test('all seven languages cover every interface and prize key, with local flags'
       assert.equal(typeof messages[code][match[1]], 'string');
     }
   }
+  assert.ok(fs.existsSync(path.join(assets, 'logo-lobster.jpg')));
+  assert.ok(fs.existsSync(path.join(assets, 'google-review-qr.svg')));
+  assert.match(read('index.html'), /search\.google\.com\/local\/writereview\?placeid=ChIJ-Qe7Cz7DD0cRHjLYqvnk1YM/);
+  assert.match(read('google-review-qr.svg'), /ChIJ-Qe7Cz7DD0cRHjLYqvnk1YM/);
 });
 
 // Minimal event/element fixture: exercises the actual app with a deterministic clock.

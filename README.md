@@ -8,6 +8,7 @@ Interaktywne koło nagród z 13 równymi polami, realistyczną animacją obrotu 
 - płynna animacja z synchronizacją wskazówki,
 - przycisk „Zatrzymaj” z płynnym hamowaniem bez zmiany wylosowanej nagrody,
 - siedem języków, flagi i zapamiętywanie wyboru języka,
+- logo Lobstera oraz kod QR i przycisk prowadzące bezpośrednio do formularza opinii Google,
 - dźwięki, konfetti i historia wyników,
 - obsługa klawiatury, pełnego ekranu i preferencji ograniczonego ruchu,
 - responsywny interfejs oraz czytelna lista nagród na telefonach,
@@ -18,6 +19,8 @@ Interaktywne koło nagród z 13 równymi polami, realistyczną animacją obrotu 
 Menu pokazuje flagę oraz nazwę języka w jego własnym zapisie. Kolejność odpowiada orientacyjnej globalnej popularności: English, 日本語, 한국어, Polski, Українська, Čeština, Беларуская. Polski jest domyślny, a wybrany język zostaje zapamiętany w przeglądarce. Tłumaczenia obejmują koło, listę nagród, komunikaty, historię, ekran wygranej i etykiety dostępności.
 
 Przycisk „Zatrzymaj” skraca obrót do płynnego hamowania, trwającego najwyżej około 1,8 sekundy. Wynik jest losowany przy starcie, więc moment zatrzymania nie zmienia szans 30%/70%. Kolejne kliknięcia nie tworzą dodatkowych wyników. Spacja uruchamia lub zatrzymuje koło, jeśli fokus nie znajduje się na innym elemencie interaktywnym. Przy systemowym ograniczeniu animacji wynik pojawia się od razu.
+
+Sekcja opinii prowadzi do profilu Lobster Brew Pub przy ul. Zwycięskiej 14cc/b. Na komputerze można zeskanować kod QR, a na telefonie otworzyć formularz przyciskiem. Opinia jest dobrowolna i pozostaje niezależna od udziału oraz wyniku losowania.
 
 ## Prawdopodobieństwa
 
@@ -54,6 +57,8 @@ Następnie otwórz `http://localhost:8080`.
 - `motion.js` — ruch koła i płynne zatrzymywanie,
 - `i18n.js` — słowniki siedmiu języków,
 - `flags/` — lokalne flagi SVG i ich licencja MIT,
+- `logo-lobster.jpg` — logo Lobstera używane w interfejsie i jako ikona strony,
+- `google-review-qr.svg` — kod QR do formularza opinii Google,
 - `tests/core.test.cjs` — testy ruchu, tłumaczeń i zachowania aplikacji,
 - `favicon.svg` — ikona strony.
 
