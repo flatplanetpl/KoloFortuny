@@ -53,6 +53,17 @@ test('all seven languages cover every interface and prize key, with local flags'
   assert.match(read('google-review-qr.svg'), /ChIJ-Qe7Cz7DD0cRHjLYqvnk1YM/);
 });
 
+test('compact layout fits portrait and landscape viewports without page scrolling', () => {
+  const css = read('styles.css');
+  assert.match(css, /body\s*\{[\s\S]*?height:\s*100dvh;[\s\S]*?overflow:\s*hidden;/);
+  assert.match(css, /\.app-shell\s*\{[\s\S]*?grid-template-rows:\s*auto minmax\(0, 1fr\) auto;[\s\S]*?overflow:\s*hidden;/);
+  assert.match(css, /\.wheel-column\s*\{[\s\S]*?container-type:\s*size;/);
+  assert.match(css, /@media \(orientation: portrait\) and \(max-width: 900px\)/);
+  assert.match(css, /@media \(orientation: landscape\) and \(max-height: 700px\)/);
+  assert.match(css, /@media \(orientation: landscape\) and \(min-width: 720px\) and \(min-height: 500px\)/);
+  assert.match(css, /width:\s*min\(100cqw, 100cqh, 48rem\)/);
+});
+
 // Minimal event/element fixture: exercises the actual app with a deterministic clock.
 class Element {
   constructor(tag = 'div') {

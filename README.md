@@ -11,7 +11,7 @@ Interaktywne koło nagród z 13 równymi polami, realistyczną animacją obrotu 
 - logo Lobstera oraz kod QR i przycisk prowadzące bezpośrednio do formularza opinii Google,
 - dźwięki, konfetti i historia wyników,
 - obsługa klawiatury, pełnego ekranu i preferencji ograniczonego ruchu,
-- responsywny interfejs oraz czytelna lista nagród na telefonach,
+- kompaktowy interfejs mieszczący się w jednym ekranie pionowo i poziomo,
 - brak zależności i procesu budowania.
 
 ## Języki i zatrzymywanie
@@ -21,6 +21,8 @@ Menu pokazuje flagę oraz nazwę języka w jego własnym zapisie. Kolejność od
 Przycisk „Zatrzymaj” skraca obrót do płynnego hamowania, trwającego najwyżej około 1,8 sekundy. Wynik jest losowany przy starcie, więc moment zatrzymania nie zmienia szans 30%/70%. Kolejne kliknięcia nie tworzą dodatkowych wyników. Spacja uruchamia lub zatrzymuje koło, jeśli fokus nie znajduje się na innym elemencie interaktywnym. Przy systemowym ograniczeniu animacji wynik pojawia się od razu.
 
 Sekcja opinii prowadzi do profilu Lobster Brew Pub przy ul. Zwycięskiej 14cc/b. Na komputerze można zeskanować kod QR, a na telefonie otworzyć formularz przyciskiem. Opinia jest dobrowolna i pozostaje niezależna od udziału oraz wyniku losowania.
+
+Układ automatycznie dopasowuje się do orientacji urządzenia. W pionie koło znajduje się nad panelem, a w poziomie obok niego. Rozmiar koła wynika z faktycznie dostępnego miejsca. Na małych ekranach drugorzędne opisy i historia są ukrywane, a zamiast kodu QR pozostaje bezpośredni przycisk do formularza opinii — dzięki temu cała gra mieści się bez przewijania strony.
 
 ## Prawdopodobieństwa
 
